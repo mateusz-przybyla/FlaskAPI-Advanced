@@ -7,8 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from api.extensions import db
 from api.models import UserModel
 from api.schemas import UserSchema
+from api.services.blocklist import add_jti_to_blocklist, is_jti_blocked
 
-from blocklist import BLOCKLIST
+from datetime import datetime, timezone
 
 blp = Blueprint("user", __name__, description="Operations on users")
 
@@ -47,10 +48,12 @@ class UserLogin(MethodView):
 
 @blp.route("/logout")
 class UserLogout(MethodView):
-    @jwt_required()
+    @jwt_required(refresh=True)
     def post(self):
         jti = get_jwt()['jti']
-        BLOCKLIST.add(jti)
+        exp = get_jwt()['exp'] - datetime.now(timezone.utc).timestamp()
+        add_jti_to_blocklist(jti, int(exp))
+        # print(is_jti_blocked(jti))
         return {"message": "Successfully logged out."}, 200
     
 @blp.route("/refresh")
@@ -59,10 +62,6 @@ class TokenRefresh(MethodView):
     def post(self):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
-
-        # Make it clear that when to add the refresh token to the blocklist will depend on the app design
-        jti = get_jwt()["jti"]
-        BLOCKLIST.add(jti)
         return {"access_token": new_token}, 200
 
 # dev endpoints to view and delete users    

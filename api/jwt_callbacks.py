@@ -1,11 +1,11 @@
 from flask import jsonify
 from api.extensions import jwt
-
-from blocklist import BLOCKLIST  
+from api.services.blocklist import is_jti_blocked
 
 @jwt.token_in_blocklist_loader
-def check_if_token_in_blocklist(jwt_header, jwt_payload):
-    return jwt_payload["jti"] in BLOCKLIST
+def check_if_token_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+    return is_jti_blocked(jti)
 
 @jwt.revoked_token_loader
 def revoked_token_callback(jwt_header, jwt_payload):
