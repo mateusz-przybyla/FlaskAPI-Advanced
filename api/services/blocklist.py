@@ -1,4 +1,4 @@
-from redis_client import redis_client
+from api.extensions import redis_client
 
 def add_jti_to_blocklist(jti: str, exp: int):
     redis_client.setex(f"blocklist:{jti}", exp, "true")
