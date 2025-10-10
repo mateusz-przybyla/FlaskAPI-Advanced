@@ -31,5 +31,15 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+  rq_worker:
+    build: .
+    depends_on:
+      redis:
+        condition: service_started
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+    command: rq worker -u ${REDIS_URL} emails
 volumes:
   postgres_data:

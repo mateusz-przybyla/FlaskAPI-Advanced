@@ -6,16 +6,20 @@ from api.extensions import api, jwt, db, migrate
 from api.resources.test import blp as TestBlueprint
 from api.resources.user import blp as UserBlueprint
 from api import jwt_callbacks
+from api.extensions import redis_client
+from rq import Queue
+
 
 def create_app():
     app = Flask(__name__)
     load_dotenv()
 
+    app.queue = Queue("emails", connection=redis_client)
+
     app.config.from_object(Config)
 
     db.init_app(app)
     migrate.init_app(app, db)
-
     api.init_app(app)
     jwt.init_app(app)
 

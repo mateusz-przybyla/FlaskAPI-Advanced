@@ -1,3 +1,4 @@
+from flask import current_app
 from flask.views import MethodView
 from flask_smorest import abort, Blueprint
 from passlib.hash import pbkdf2_sha256 as sha256
@@ -8,6 +9,7 @@ from api.extensions import db
 from api.models import UserModel
 from api.schemas import UserSchema
 from api.services.blocklist import add_jti_to_blocklist, is_jti_blocked
+from api.workers.mail_worker import send_user_registration_email
 
 from datetime import datetime, timezone
 
@@ -28,6 +30,12 @@ class UserRegister(MethodView):
         try:
             db.session.add(user)
             db.session.commit()
+
+            current_app.queue.enqueue(
+                send_user_registration_email,   
+                user.email,
+                # user.username   
+            )
         except SQLAlchemyError:
             abort(500, message="An error occurred while creating the user.")
 
