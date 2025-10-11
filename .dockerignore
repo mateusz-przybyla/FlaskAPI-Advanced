@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+
+# Environments
+.venv/
+
+# Flask stuff
+instance/
+
+# Secrets
+.env
+
+# Tests / coverage reports
+.pytest_cache/
+.coverage
+
+# Git
+.git/
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose.yml
+Dockerfile
+
+# Documentation
+README.md
+readme/
+postman/
