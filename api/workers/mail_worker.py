@@ -12,9 +12,9 @@ def send_simple_message(to, subject, body):
   			"subject": subject,
   			"text": body})
 
-def send_user_registration_email(email):
+def send_user_registration_email(email, username):
     return send_simple_message(
         to=email,  
         subject="Successfully signed up",
-        body=f"Hi {email}, you have successfully signed up for our service!"
+        body=f"Hi {username}, you have successfully signed up for our service!"
     )

@@ -23,6 +23,7 @@ class UserRegister(MethodView):
             abort(409, message="A user with that email already exists.")
 
         user = UserModel(
+            username=user_data['username'],
             email=user_data['email'],
             password=sha256.hash(user_data['password'])
         )
@@ -34,7 +35,7 @@ class UserRegister(MethodView):
             current_app.queue.enqueue(
                 send_user_registration_email,   
                 user.email,
-                # user.username   
+                user.username   
             )
         except SQLAlchemyError:
             abort(500, message="An error occurred while creating the user.")
