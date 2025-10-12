@@ -31,14 +31,17 @@ class UserRegister(MethodView):
         try:
             db.session.add(user)
             db.session.commit()
+        except SQLAlchemyError:
+            abort(500, message="An error occurred while creating the user.")
 
+        try:
             current_app.queue.enqueue(
                 send_user_registration_email,   
                 user.email,
                 user.username   
             )
-        except SQLAlchemyError:
-            abort(500, message="An error occurred while creating the user.")
+        except Exception as e:
+            current_app.logger.error(f"Failed to enqueue email task: {e}")
 
         return {"message": "User created successfully."}, 201
         
