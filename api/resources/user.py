@@ -35,7 +35,7 @@ class UserRegister(MethodView):
             abort(500, message="An error occurred while creating the user.")
 
         try:
-            current_app.queue.enqueue(
+            current_app.email_queue.enqueue(
                 send_user_registration_email,   
                 user.email,
                 user.username   
