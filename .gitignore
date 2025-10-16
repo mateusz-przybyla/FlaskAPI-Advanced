@@ -13,3 +13,4 @@ instance/
 # Tests / coverage reports
 .pytest_cache/
 .coverage
+coverage.*
