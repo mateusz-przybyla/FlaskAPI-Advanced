@@ -1,1 +1,1 @@
-from api.schemas.user import UserSchema
+from api.schemas.user import UserSchema, UserRegisterSchema
