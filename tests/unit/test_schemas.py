@@ -1,64 +1,96 @@
 import pytest
 from marshmallow import ValidationError
 
-from api.schemas import UserSchema
+from api.schemas import UserSchema, UserRegisterSchema
 from api.models import UserModel
 
+# -------------------------
+# Fixtures
+# -------------------------
 @pytest.fixture
-def schema():
+def base_schema():
     return UserSchema()
 
-def test_user_schema_validation(schema):
-    user_dict = {"username": "user", "email": "test@example.com", "password": "abc123"}
+@pytest.fixture
+def register_schema():
+    return UserRegisterSchema()
 
-    # Test loading (deserialization)
-    loaded = schema.load(user_dict)
-    assert loaded["username"] == "user"
-    assert loaded["email"] == "test@example.com"
-    assert "password" in loaded
+# -------------------------
+# Tests for UserSchema (email + password only)
+# -------------------------
+def test_user_schema_valid_data(base_schema):
+    user_dict = {"email": "test@example.com", "password": "abc123"}
 
-    # Test dumping (serialization)
+    # deserialization (load)
+    loaded = base_schema.load(user_dict)
+    assert loaded['email'] == "test@example.com"
+    assert loaded['password'] == "abc123"
+
+    # serialization (dump)
     user_obj = UserModel(username="user", email="test@example.com", password="abc123")
-    dumped = schema.dump(user_obj)
-    assert dumped["username"] == "user"
-    assert dumped["email"] == "test@example.com"
+    dumped = base_schema.dump(user_obj)
+    assert dumped['email'] == "test@example.com"
     assert "password" not in dumped
 
-def test_missing_required_fields(schema):
-    user_dict = {"username": "user"}
+def test_user_schema_missing_fields(base_schema):
+    user_dict = {"email": "test@example.com"}  # missing password
 
     with pytest.raises(ValidationError) as exc_info:
-        schema.load(user_dict)
+        base_schema.load(user_dict)
 
     errors = exc_info.value.messages
-    assert "email" in errors
     assert "password" in errors
 
-def test_username_too_short(schema):
-    user_dict = {"username": "ab", "email": "test@example.com", "password": "abc123"}
+def test_user_schema_password_too_short(base_schema):
+    user_dict = {"email": "test@example.com", "password": "abc"}
 
     with pytest.raises(ValidationError) as exc_info:
-        schema.load(user_dict)
-
-    errors = exc_info.value.messages
-    assert "username" in errors
-    assert "Length must be between 3 and 80." in errors["username"][0]
-
-def test_password_too_short(schema):
-    user_dict = {"username": "user", "email": "test@example.com", "password": "ab"}
-
-    with pytest.raises(ValidationError) as exc_info:
-        schema.load(user_dict)
+        base_schema.load(user_dict)
 
     errors = exc_info.value.messages
     assert "password" in errors
     assert "Shorter than minimum length 6." in errors["password"][0]
 
-def test_invalid_email_format(schema):
+def test_user_schema_invalid_email(base_schema):
     user_dict = {"username": "user", "email": "not-an-email", "password": "abc123"}
 
     with pytest.raises(ValidationError) as exc_info:
-        schema.load(user_dict)
+        base_schema.load(user_dict)
 
     errors = exc_info.value.messages
     assert "email" in errors
+
+# -------------------------
+# Tests for UserRegisterSchema (extends UserSchema + username)
+# -------------------------
+def test_register_schema_valid_data(register_schema):
+    user_dict = {"username": "user", "email": "test@example.com", "password": "abc123"}
+
+    loaded = register_schema.load(user_dict)
+    assert loaded['username'] == "user"
+    assert loaded['email'] == "test@example.com"
+
+    user_obj = UserModel(username="user", email="test@example.com", password="abc123")
+    dumped = register_schema.dump(user_obj)
+    assert dumped['username'] == "user"
+    assert dumped['email'] == "test@example.com"
+    assert "password" not in dumped
+
+def test_register_schema_missing_username(register_schema):
+    user_dict = {"email": "test@example.com", "password": "abc123"}
+
+    with pytest.raises(ValidationError) as exc_info:
+        register_schema.load(user_dict)
+
+    errors = exc_info.value.messages
+    assert "username" in errors
+
+def test_register_schema_username_too_short(register_schema):
+    user_dict = {"username": "ab", "email": "test@example.com", "password": "abc123"}
+
+    with pytest.raises(ValidationError) as exc_info:
+        register_schema.load(user_dict)
+
+    errors = exc_info.value.messages
+    assert "username" in errors
+    assert "Length must be between 3 and 80." in errors["username"][0]
