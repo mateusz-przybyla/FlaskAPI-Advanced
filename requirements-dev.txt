@@ -4,3 +4,4 @@ pytest
 pytest-flask
 pytest-cov
 pytest-mock
+fakeredis
