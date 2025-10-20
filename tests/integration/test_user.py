@@ -1,4 +1,6 @@
 import pytest
+from flask_jwt_extended import create_access_token
+from datetime import timedelta
 
 @pytest.fixture()
 def create_user_details(client):
@@ -173,3 +175,54 @@ def test_refresh_token(client, create_user_jwts):
 
     assert response.status_code == 200
     assert response.json['access_token']
+
+def test_expired_token_callback(client):
+    expired_token = create_access_token(
+        identity="1",
+        expires_delta=timedelta(seconds=-1)
+    )
+    response = client.get(
+        "/protected",
+        headers={"Authorization": f"Bearer {expired_token}"}
+    )
+
+    assert response.status_code == 401
+    assert response.json['error'] == "token_expired"
+    assert response.json['message'] == "The token has expired."
+
+def test_protected_with_access_token(client, create_user_jwts):
+    response = client.get(
+        "/protected", 
+        headers={"Authorization": f"Bearer {create_user_jwts[0]}"}
+    )
+    
+    assert response.status_code == 200
+    assert response.json['message'] == "This is a protected endpoint."
+
+def test_protected_without_token(client):
+    response = client.get("/protected")
+
+    assert response.status_code == 401
+    assert response.json['error'] == "authorization_required"
+
+def test_fresh_protected_with_non_fresh_token(client, create_user_jwts):
+    response = client.post(
+        "/refresh", 
+        headers={"Authorization": f"Bearer {create_user_jwts[1]}"}
+    )
+    response = client.get(
+        "/fresh-protected", 
+        headers={"Authorization": f"Bearer {response.json['access_token']}"}
+    )
+
+    assert response.status_code == 401
+    assert response.json['error'] == "fresh_token_required"
+
+def test_fresh_protected_with_fresh_token(client, create_user_jwts):
+    response = client.get(
+        "/fresh-protected", 
+        headers={"Authorization": f"Bearer {create_user_jwts[0]}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json['message'] == "This is a protected endpoint. You used a fresh token to access it."

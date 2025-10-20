@@ -1,6 +1,6 @@
 # FlaskAPI-Advanced
 
-Advanced Flask REST API boilerplate with JWT authentication, PostgreSQL, Redis, background jobs, Mailgun integration and complete testing suite.
+Advanced Flask REST API boilerplate with JWT authentication, PostgreSQL, Redis, background jobs, Mailgun integration and tests.
 
 ---
 
@@ -33,7 +33,7 @@ Advanced Flask REST API boilerplate with JWT authentication, PostgreSQL, Redis, 
 - Database migrations with **Flask-Migrate / Alembic**
 - Environment variable support via `.env` / `.flaskenv`
 - Docker and docker-compose setup
-- Unit, integration and system tests with **pytest**
+- Unit and integration tests with **pytest**
 
 ---
 
@@ -350,16 +350,15 @@ pytest -v
 Run all tests with coverage:
 
 ```bash
-pytest -v --cov=app tests/
+pytest -v --cov=api tests/
 ```
 
 Run all tests with coverage via Docker:
 
 ```bash
-docker-compose exec web pytest -v --cov=app tests/
+docker-compose exec web pytest -v --cov=api tests/
 ```
 
 Test structure:
 - `tests/unit/` → models, schemas, helpers
 - `tests/integration/` → auth flow, protected endpoints
-- `tests/system/` → full end-to-end tests via Docker Compose
