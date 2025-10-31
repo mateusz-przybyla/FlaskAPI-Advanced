@@ -8,12 +8,9 @@ from types import SimpleNamespace
 
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config.update({
-        "DEBUG": False,
+    app = create_app({
         "TESTING": True,
         "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "JWT_SECRET_KEY": "test-secret"
     })
 

@@ -7,11 +7,14 @@ from api.resources.test import blp as TestBlueprint
 from api.resources.user import blp as UserBlueprint
 from api import jwt_callbacks
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
     load_dotenv()
 
     app.config.from_object(Config)
+
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
     migrate.init_app(app, db)
