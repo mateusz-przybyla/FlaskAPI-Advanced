@@ -10,7 +10,7 @@ from api.extensions import db
 from api.models import UserModel
 from api.schemas import UserSchema, UserRegisterSchema
 from api.services.blocklist import add_jti_to_blocklist, is_jti_blocked
-from api.workers.mail_worker import send_user_registration_email
+from workers.mail_worker import send_user_registration_email
 
 blp = Blueprint("user", __name__, description="Operations on users")
 
