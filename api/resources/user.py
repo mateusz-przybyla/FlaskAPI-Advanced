@@ -85,7 +85,7 @@ class TokenRefresh(MethodView):
         return {"access_token": new_token}
 
 # dev endpoints to view and delete users    
-@blp.route("/user/<int:user_id>")
+@blp.route("/users/<int:user_id>")
 class User(MethodView):
     @blp.response(200, UserSchema, description="User details retrieved successfully.")
     @blp.alt_response(404, description="User not found.")

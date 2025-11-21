@@ -141,7 +141,7 @@ def test_logout_user_invalid_token(client):
 
 def test_get_user_details(client, create_user_details):
     response = client.get(
-        "/user/1",  # assume user id is 1
+        "/users/1",  # assume user id is 1
     )
 
     assert response.status_code == 200
@@ -152,7 +152,7 @@ def test_get_user_details(client, create_user_details):
 
 def test_get_user_details_missing(client):
     response = client.get(
-        "/user/23",
+        "/users/23",
     )
 
     assert response.status_code == 404
