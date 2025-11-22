@@ -1,233 +1,236 @@
 {
 	"info": {
-		"_postman_id": "7d77f53c-1902-4a8f-aa49-2a4ed4a7370c",
+		"_postman_id": "9c0608ed-20c1-4572-91b3-fc1ca83ec708",
 		"name": "FlaskAPI-Advanced",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "38035327"
 	},
 	"item": [
 		{
-			"name": "/register - create user",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"mateusz\",\r\n    \"email\": \"mateusz.przybyla.programista@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "User",
+			"item": [
+				{
+					"name": "/register - create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"mateusz123\",\r\n    \"email\": \"mateusz.przybyla.programista@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"register"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{url}}/register",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/login - authenticate user",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"mateusz.przybyla.programista@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "/login - authenticate user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mateusz.przybyla.programista@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"login"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{url}}/login",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/user/<id> - get user (dev)",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/user/11",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"user",
-						"11"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/user/<id> - delete user (dev)",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
+				{
+					"name": "/users/<id> - get user (dev)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/user/10",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"user",
-						"10"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/refresh - get non-fresh token",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{refresh}}",
-							"type": "string"
+				{
+					"name": "/users/<id> - delete user (dev)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/refresh",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"refresh"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/logout - revoke jwt",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{refresh}}",
-							"type": "string"
+				{
+					"name": "/refresh - get non-fresh token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refresh}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/refresh",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/logout",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/guest - test guest endpoint",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/guest",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"guest"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/protected - test protected endpoint",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
+				{
+					"name": "/logout - revoke jwt",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refresh}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"logout"
+							]
 						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/protected",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"protected"
-					]
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "/fresh-protected - test fresh protected endpoint",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
+			"name": "Test",
+			"item": [
+				{
+					"name": "/fresh-protected - test fresh protected endpoint",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/fresh-protected",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"fresh-protected"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/fresh-protected",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"fresh-protected"
-					]
+				{
+					"name": "/protected - test protected endpoint",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/protected",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"protected"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/guest - test guest endpoint",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/guest",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"guest"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	]
 }
