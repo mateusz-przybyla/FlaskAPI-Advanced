@@ -173,25 +173,6 @@ def test_logout_user_adds_token_to_blocklist(client, create_user_jwts, fake_redi
 
     assert fake_redis_client.exists(f"blocklist:{jti}") == 1
 
-def test_get_user_details(client, create_user_details):
-    response = client.get(
-        "/users/1",  # assume user id is 1
-    )
-
-    assert response.status_code == 200
-    assert response.json == {
-        "id": 1,
-        "email": create_user_details[1],
-    }
-
-def test_get_user_details_missing(client):
-    response = client.get(
-        "/users/23",
-    )
-
-    assert response.status_code == 404
-    assert response.json == {"code": 404, "status": "Not Found"}
-
 def test_refresh_token_invalid(client, fake_redis_client):
     response = client.post(
         "/refresh",
@@ -199,7 +180,6 @@ def test_refresh_token_invalid(client, fake_redis_client):
     )
 
     assert response.status_code == 401
-
 
 def test_refresh_token(client, create_user_jwts, fake_redis_client):
     response = client.post(
@@ -209,6 +189,8 @@ def test_refresh_token(client, create_user_jwts, fake_redis_client):
 
     assert response.status_code == 200
     assert response.json['access_token']
+
+# Dev endpoint tests
 
 def test_expired_token_callback(client, fake_redis_client):
     expired_token = create_access_token(
@@ -260,3 +242,22 @@ def test_fresh_protected_with_fresh_token(client, create_user_jwts, fake_redis_c
 
     assert response.status_code == 200
     assert response.json['message'] == "This is a protected endpoint. You used a fresh token to access it."
+
+def test_get_user_details(client, create_user_details):
+    response = client.get(
+        "/users/1",  # assume user id is 1
+    )
+
+    assert response.status_code == 200
+    assert response.json == {
+        "id": 1,
+        "email": create_user_details[1],
+    }
+
+def test_get_user_details_missing(client):
+    response = client.get(
+        "/users/23",
+    )
+
+    assert response.status_code == 404
+    assert response.json == {"code": 404, "status": "Not Found"}
