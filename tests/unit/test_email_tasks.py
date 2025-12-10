@@ -1,8 +1,8 @@
-from workers.mail_worker import send_user_registration_email
+from api.tasks.email_tasks import send_user_registration_email
 
 def test_send_user_registration_email_calls_mailgun_and_renders_template(mocker):
-    mock_render = mocker.patch("workers.mail_worker.render_template", return_value="<html>")
-    mock_mailgun = mocker.patch("workers.mail_worker.send_mailgun_message", return_value="OK")
+    mock_render = mocker.patch("api.tasks.email_tasks.render_template", return_value="<html>")
+    mock_mailgun = mocker.patch("api.tasks.email_tasks.send_mailgun_message", return_value="OK")
 
     result = send_user_registration_email("test@example.com", "test_user")
 

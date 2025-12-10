@@ -14,10 +14,13 @@ Advanced Flask REST API boilerplate with JWT authentication, PostgreSQL, Redis, 
 - [Database Schema](#database-schema)
 - [Endpoints](#endpoints)
     - [Auth](#auth)
-    - [Test auth](#test-auth)
-    - [User management (dev only)](#user-management-dev-only)
+    - [Developer Endpoints](#developer-endpoints)
 - [Validation and Errors](#validation-and-errors)
 - [Background Jobs and emails](#background-jobs-and-emails)
+    - [Email Queue](#email-queue)
+    - [Worker](#worker)
+    - [Email Tasks](#email-tasks)
+    - [Flow Overview](#flow-overview)
 - [Testing](#testing)
 
 ---
@@ -216,7 +219,7 @@ docker compose down
   **Headers:** `Authorization: Bearer <refresh_token>`\
   **Response:** `{ "message": "Successfully logged out." }`, `200 OK`
 
-### Test Auth
+### Developer endpoints
 
 Endpoints for verifying JWT behavior:
 
@@ -224,7 +227,7 @@ Endpoints for verifying JWT behavior:
 - **GET** `/protected` → requires valid access token
 - **GET** `/fresh-protected` → requires fresh token (i.e. directly from login, not from refresh)
 
-### User management (dev only)
+Endpoints for user management:
 
 - **GET** `/user/<id>`\
   Fetch user by id.\
@@ -328,16 +331,28 @@ Endpoints for verifying JWT behavior:
 
 ## Background Jobs and Emails
 
-The api integrates RQ (Redis Queue) for background task processing.
+The API uses RQ (Redis Queue) for background task processing — for example, sending emails asynchronously after user registration.
 
-- Example job: send welcome email after user registration.
-- Worker defined in mail_worker.py listens to the emails queue.
+### Email Queue
 
-Example flow:
+Email-related tasks are enqueued into the `emails` queue, defined in `api/extensions.py`.
 
-- User registers
-- Flask api enqueues job → Redis
-- mail_worker picks job → sends email via Mailgun
+### Worker
+
+A dedicated RQ worker listens to this queue.
+
+### Email Tasks
+
+Email tasks are defined in `api/tasks/email_tasks.py`.
+
+### Flow Overview
+
+- User registers via the `/register` endpoint.
+- API validates data, saves user in the DB.
+- API enqueues email task.
+- Job is stored in **Redis**.
+- The running **email worker** (`workers.email_worker`) picks up the job.
+- Email is rendered with Jinja2 and sent using **Mailgun**.
 
 ## Testing
 
