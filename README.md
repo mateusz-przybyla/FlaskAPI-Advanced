@@ -219,6 +219,11 @@ docker compose down
   **Headers:** `Authorization: Bearer <refresh_token>`\
   **Response:** `{ "message": "Successfully logged out." }`, `200 OK`
 
+- **GET** `/users/me`\
+  Retrieve the profile of the currently authenticated user.\
+  **Headers:** `Authorization: Bearer <access_token>`\
+  **Response:** `{ "email": "...", "id": "..." }`, `200 OK`
+
 ### Developer endpoints
 
 Endpoints for verifying JWT behavior:
@@ -229,12 +234,12 @@ Endpoints for verifying JWT behavior:
 
 Endpoints for user management:
 
-- **GET** `/user/<id>`\
+- **GET** `/users/<id>`\
   Fetch user by id.\
   **Response:** `200 OK` → with user data\
   **Errors:** 
     - `404 Not Found` → if user doesnt't exist
-- **DELETE** `/user/<id>`\
+- **DELETE** `/users/<id>`\
   Delete user.\
   **Response:** `{ "message": "User deleted." }`, `200 OK`\
   **Errors:**
