@@ -1,13 +1,6 @@
 import pytest
-import fakeredis
 from flask_jwt_extended import create_access_token, decode_token
 from datetime import timedelta
-
-@pytest.fixture
-def fake_redis_client(mocker):
-    fake_redis = fakeredis.FakeRedis()
-    mocker.patch("api.services.blocklist.redis_client", fake_redis)
-    return fake_redis
 
 @pytest.fixture
 def mock_email_queue(mocker):
@@ -49,7 +42,7 @@ def test_register_user(client, mock_email_queue):
     assert response.json == {"message": "User created successfully."}
 
     mock_email_queue.enqueue.assert_called_once()
-    args, kwargs = mock_email_queue.enqueue.call_args
+    args, _ = mock_email_queue.enqueue.call_args
     assert args[0].__name__ == "send_user_registration_email"
     assert args[1] == "test@example.com"
     assert args[2] == "user"
@@ -112,7 +105,7 @@ def test_login_user_bad_email(client, create_user_details):
     assert response.status_code == 401
     assert response.json["message"] == "Invalid credentials."
 
-def test_logout_user(client, create_user_jwts, fake_redis_client):
+def test_logout_user(client, create_user_jwts):
     response = client.post(
         "/logout",
         headers={"Authorization": f"Bearer {create_user_jwts[1]}"},
@@ -121,7 +114,7 @@ def test_logout_user(client, create_user_jwts, fake_redis_client):
     assert response.status_code == 200
     assert response.json["message"] == "Successfully logged out."
 
-def test_logout_user_twice(client, create_user_jwts, fake_redis_client):
+def test_logout_user_twice(client, create_user_jwts):
     client.post(
         "/logout",
         headers={"Authorization": f"Bearer {create_user_jwts[1]}"},
@@ -137,7 +130,7 @@ def test_logout_user_twice(client, create_user_jwts, fake_redis_client):
         "error": "token_revoked",
     }
 
-def test_logout_user_no_token(client, fake_redis_client):
+def test_logout_user_no_token(client):
     response = client.post(
         "/logout",
     )
@@ -145,7 +138,7 @@ def test_logout_user_no_token(client, fake_redis_client):
     assert response.status_code == 401
     assert response.json['message'] == "Request does not contain an access token."
 
-def test_logout_user_invalid_token(client, fake_redis_client):
+def test_logout_user_invalid_token(client):
     response = client.post(
         "/logout",
         headers={"Authorization": "Bearer bad_token"},
@@ -157,7 +150,7 @@ def test_logout_user_invalid_token(client, fake_redis_client):
         "message": "Signature verification failed.",
     }
 
-def test_logout_user_adds_token_to_blocklist(client, create_user_jwts, fake_redis_client):
+def test_logout_user_adds_token_to_blocklist(client, create_user_jwts, mock_redis):
     refresh_token = create_user_jwts[1]
 
     response = client.post(
@@ -171,9 +164,9 @@ def test_logout_user_adds_token_to_blocklist(client, create_user_jwts, fake_redi
     decoded = decode_token(refresh_token)
     jti = decoded['jti']
 
-    assert fake_redis_client.exists(f"blocklist:{jti}") == 1
+    assert mock_redis.exists(f"blocklist:{jti}") == 1
 
-def test_refresh_token_invalid(client, fake_redis_client):
+def test_refresh_token_invalid(client):
     response = client.post(
         "/refresh",
         headers={"Authorization": "Bearer bad_jwt"},
@@ -181,7 +174,7 @@ def test_refresh_token_invalid(client, fake_redis_client):
 
     assert response.status_code == 401
 
-def test_refresh_token(client, create_user_jwts, fake_redis_client):
+def test_refresh_token(client, create_user_jwts):
     response = client.post(
         "/refresh",
         headers={"Authorization": f"Bearer {create_user_jwts[1]}"},
@@ -192,7 +185,7 @@ def test_refresh_token(client, create_user_jwts, fake_redis_client):
 
 # Dev endpoint tests
 
-def test_expired_token_callback(client, fake_redis_client):
+def test_expired_token_callback(client):
     expired_token = create_access_token(
         identity="1",
         expires_delta=timedelta(seconds=-1)
@@ -206,7 +199,7 @@ def test_expired_token_callback(client, fake_redis_client):
     assert response.json['error'] == "token_expired"
     assert response.json['message'] == "The token has expired."
 
-def test_protected_with_access_token(client, create_user_jwts, fake_redis_client):
+def test_protected_with_access_token(client, create_user_jwts):
     response = client.get(
         "/protected", 
         headers={"Authorization": f"Bearer {create_user_jwts[0]}"}
@@ -215,13 +208,13 @@ def test_protected_with_access_token(client, create_user_jwts, fake_redis_client
     assert response.status_code == 200
     assert response.json['message'] == "This is a protected endpoint."
 
-def test_protected_without_token(client, fake_redis_client):
+def test_protected_without_token(client):
     response = client.get("/protected")
 
     assert response.status_code == 401
     assert response.json['error'] == "authorization_required"
 
-def test_fresh_protected_with_non_fresh_token(client, create_user_jwts, fake_redis_client):
+def test_fresh_protected_with_non_fresh_token(client, create_user_jwts):
     response = client.post(
         "/refresh", 
         headers={"Authorization": f"Bearer {create_user_jwts[1]}"}
@@ -234,7 +227,7 @@ def test_fresh_protected_with_non_fresh_token(client, create_user_jwts, fake_red
     assert response.status_code == 401
     assert response.json['error'] == "fresh_token_required"
 
-def test_fresh_protected_with_fresh_token(client, create_user_jwts, fake_redis_client):
+def test_fresh_protected_with_fresh_token(client, create_user_jwts):
     response = client.get(
         "/fresh-protected", 
         headers={"Authorization": f"Bearer {create_user_jwts[0]}"}

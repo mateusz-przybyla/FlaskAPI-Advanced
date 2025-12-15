@@ -1,20 +1,19 @@
 from api.services import blocklist
 
-def test_add_jti_calls_redis_setex(mocker):
-    mock_redis = mocker.patch("api.services.blocklist.redis_client")
+def test_add_and_check_blocklist():
     jti = "test_jti"
-    exp = 60
 
-    blocklist.add_jti_to_blocklist(jti, exp)
+    blocklist.add_jti_to_blocklist(jti, exp=60)
 
-    mock_redis.setex.assert_called_once_with(f"blocklist:{jti}", exp, "true")
+    assert blocklist.is_jti_blocked(jti) is True
 
-def test_is_jti_blocked_returns_true(mocker):
-    mock_redis = mocker.patch("api.services.blocklist.redis_client")
-    mock_redis.exists.return_value = 1
-    assert blocklist.is_jti_blocked("abc123") is True
+def test_adding_same_jti_twice_is_safe():
+    jti = "abc123"
 
-def test_is_jti_blocked_returns_false(mocker):
-    mock_redis = mocker.patch("api.services.blocklist.redis_client")
-    mock_redis.exists.return_value = 0
-    assert blocklist.is_jti_blocked("abc123") is False
+    blocklist.add_jti_to_blocklist(jti, exp=60)
+    blocklist.add_jti_to_blocklist(jti, exp=60)
+
+    assert blocklist.is_jti_blocked(jti) is True
+
+def test_is_jti_blocked_returns_false():
+    assert blocklist.is_jti_blocked("non_existing_jti") is False

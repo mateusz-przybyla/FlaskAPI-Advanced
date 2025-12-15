@@ -1,4 +1,5 @@
 import pytest
+import fakeredis
 
 from api import create_app
 from api.extensions import db
@@ -26,3 +27,9 @@ def client(app):
 def db_session(app):
     with app.app_context():
         yield db.session
+
+@pytest.fixture(autouse=True)
+def mock_redis(mocker):
+    fake_redis = fakeredis.FakeRedis()
+    mocker.patch("api.services.blocklist.redis_client", fake_redis)
+    return fake_redis
