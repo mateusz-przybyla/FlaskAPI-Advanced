@@ -1,6 +1,6 @@
 # FlaskAPI-Advanced
 
-Advanced Flask REST API boilerplate with JWT authentication, PostgreSQL, Redis, background jobs, Mailgun integration and tests.
+An advanced Flask REST API boilerplate with JWT authentication, PostgreSQL, Redis, background jobs, Mailgun integration and tests.
 
 ---
 
@@ -16,7 +16,7 @@ Advanced Flask REST API boilerplate with JWT authentication, PostgreSQL, Redis, 
     - [Auth](#auth)
     - [Developer Endpoints](#developer-endpoints)
 - [Validation and Errors](#validation-and-errors)
-- [Background Jobs and emails](#background-jobs-and-emails)
+- [Background Jobs](#background-jobs)
     - [Email Queue](#email-queue)
     - [Worker](#worker)
     - [Email Tasks](#email-tasks)
@@ -334,9 +334,10 @@ Endpoints for user management:
 
 ---
 
-## Background Jobs and Emails
+## Background Jobs
 
-The API uses RQ (Redis Queue) for background task processing — for example, sending emails asynchronously after user registration.
+This template uses a minimal background job setup (no retry logic or advanced error handling) to keep the project simple and easy to extend.
+The API uses **RQ (Redis Queue)** to process background tasks - for example: sending emails asynchronously after user registration.
 
 ### Email Queue
 
@@ -344,11 +345,11 @@ Email-related tasks are enqueued into the `emails` queue, defined in `api/extens
 
 ### Worker
 
-A dedicated RQ worker listens to this queue.
+A dedicated RQ worker listens to this queue and processes incoming jobs.
 
 ### Email Tasks
 
-Email tasks are defined in `api/tasks/email_tasks.py`.
+Email tasks are implemented in `api/tasks/email_tasks.py`.
 
 ### Flow Overview
 
